@@ -6,10 +6,12 @@
   </head>
   <body>
     <button id="postTradeTrigger" type="button">Post Trade</button>
-    <form onsubmit="return false;">
-    <input type="text" name="message" value="Hello, World!"/>
-    <input type="button" value="Send Web Socket Data" onclick="send(this.form.message.value)"/>
-    </form>
+
+    <div id="volumeChartContainer"></div>
+
+    <script src="webjars/momentjs/2.9.0/min/moment.min.js"></script>
+    <script src="webjars/highcharts/4.0.4/adapters/standalone-framework.js"></script>
+    <script src="webjars/highcharts/4.0.4/highcharts.src.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
