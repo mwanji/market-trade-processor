@@ -64,7 +64,9 @@ var APP = {
   });
 
   volumeChart = new Highcharts.Chart({
-    title: "Total amount by currency",
+    title: {
+      text: "Total amount by currency"
+    },
     xAxis: {
       type: "datetime"
     },
