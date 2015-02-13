@@ -1,5 +1,9 @@
 # Market Trade Processor
 
+## WARNING
+
+It was unclear what the date format in the trades' JSON is. I used `DD-MMM-YY HH:mm:ss`, but it could also be `YY-MMM-DD HH:mm:ss`.
+
 ## Flow
 
 When a JSON object is POSTed to /message, it is lightly modified and broadcast to all open websockets.
@@ -18,6 +22,10 @@ Execute the Launcher class. Then visit `http://localhost:8082`
 [Gson](https://code.google.com/p/google-gson/): Java JSON library
 [Highcharts](http://www.highcharts.com): JavaScript charts
 [Moment.js](http://momentjs.com): JavaScript dates
+
+## Unit test
+
+There is a single unit test that starts the server and a standalone websocket client, POSTs to /messages and checks the message received by the websocket.
 
 ## Potential modifications
 
