@@ -1,42 +1,39 @@
 package com.moandjiezana.currencyfair.markettradeprocessor;
 
-import static io.undertow.Handlers.resource;
-import static io.undertow.Handlers.websocket;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.handlers.resource.ClassPathResourceManager;
-import io.undertow.util.Methods;
-import io.undertow.websockets.core.AbstractReceiveListener;
-import io.undertow.websockets.core.BufferedTextMessage;
-import io.undertow.websockets.core.WebSocketChannel;
-import io.undertow.websockets.core.WebSockets;
-import io.undertow.websockets.spi.WebSocketHttpExchange;
+import io.undertow.server.handlers.resource.FileResourceManager;
+import io.undertow.servlet.Servlets;
+import io.undertow.servlet.api.DeploymentManager;
+import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 
-import java.io.IOException;
+import java.nio.file.Paths;
+
 
 public class Launcher {
 
-  public static void main(String[] args) {
-    HttpHandler websocketHandler = websocket((WebSocketHttpExchange exchange, WebSocketChannel channel) -> {
-      channel.getReceiveSetter().set(new AbstractReceiveListener() {
-        @Override
-        protected void onFullTextMessage(final WebSocketChannel channel, BufferedTextMessage message) throws IOException {
-          WebSockets.sendText(message.getData(), channel, null);  
-        }
-      });
-      channel.resumeReceives();
-    });
+  public static void main(String[] args) throws Exception {
+    DeploymentManager manager = Servlets.defaultContainer()
+      .addDeployment(
+      Servlets.deployment()
+        .setClassLoader(Launcher.class.getClassLoader())
+        .setContextPath("/")
+        .setDeploymentName("markettradeprocessor.war")
+        .setResourceManager(new FileResourceManager(Paths.get("src", "main", "resources", "META-INF", "resources").toFile(), 1000000))
+        .addWelcomePage("index.html")
+        .addServlets(Servlets.servlet(MessagesServlet.class.getSimpleName(), MessagesServlet.class)
+          .addMapping("/messages"))
+        .addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME,
+          new WebSocketDeploymentInfo()
+            .addEndpoint(MessagesEndpoint.class))
+    );
     
-    HttpHandler messagesHandler = Handlers.predicate(exchange -> exchange.getRequestMethod().equals(Methods.GET), websocketHandler, exchange -> {});
-
-    HttpHandler rootHandler = Handlers.path()
-      .addExactPath("/", resource(new ClassPathResourceManager(Launcher.class.getClassLoader(), Launcher.class.getPackage())).addWelcomeFiles("index.html"))
-      .addExactPath("/messages", messagesHandler);
+    manager.deploy();
       
     Undertow.builder()
       .addHttpListener(8082, "localhost")
-      .setHandler(rootHandler)
+      .setHandler(Handlers.path()
+        .addPrefixPath("/", manager.start()))
       .build()
       .start();
   }
