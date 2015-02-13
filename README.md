@@ -8,14 +8,16 @@ When the websocket clients receive a message, they add it to the chart they are 
 
 ## How to run
 
+The server is written in Java 8 and requires Maven to build. The client is in JavaScript.
+
 Execute the Launcher class. Then visit `http://localhost:8082`
 
 ## Libraries
 
-Undertow: small, embedabble, non-blocking server in Java based on Netty. Chosen because it is fast and low on resources.
-Gson: Java JSON library
-Highcharts: JavaScript charts
-moment.js: JavaScript dates
+[Undertow](http://undertow.io): small, embedabble, non-blocking server in Java based on Netty. Chosen because it is fast and low on resources.
+[Gson](https://code.google.com/p/google-gson/): Java JSON library
+[Highcharts](http://www.highcharts.com): JavaScript charts
+[Moment.js](http://momentjs.com): JavaScript dates
 
 ## Potential modifications
 
