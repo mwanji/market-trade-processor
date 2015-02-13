@@ -1,13 +1,12 @@
 package com.moandjiezana.currencyfair.markettradeprocessor;
 
+import static io.undertow.servlet.Servlets.servlet;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
-import io.undertow.server.handlers.resource.FileResourceManager;
+import io.undertow.server.handlers.resource.ClassPathResourceManager;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
-
-import java.nio.file.Paths;
 
 
 public class Launcher {
@@ -19,10 +18,11 @@ public class Launcher {
         .setClassLoader(Launcher.class.getClassLoader())
         .setContextPath("/")
         .setDeploymentName("markettradeprocessor.war")
-        .setResourceManager(new FileResourceManager(Paths.get("src", "main", "resources", "META-INF", "resources").toFile(), 1000000))
+        .setResourceManager(new ClassPathResourceManager(Thread.currentThread().getContextClassLoader(), "META-INF/resources"))
         .addWelcomePage("index.html")
-        .addServlets(Servlets.servlet(MessagesServlet.class.getSimpleName(), MessagesServlet.class)
-          .addMapping("/messages"))
+        .addServlets(
+          servlet(MessagesServlet.class.getSimpleName(), MessagesServlet.class)
+            .addMapping("/messages"))
         .addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME,
           new WebSocketDeploymentInfo()
             .addEndpoint(MessagesEndpoint.class))
